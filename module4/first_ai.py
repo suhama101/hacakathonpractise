@@ -1,8 +1,8 @@
 from groq import Groq
-from dotenv import load_dotenv
+from dotenv import load_dotenv,find_dotenv
 import os
 
-load_dotenv()
+load_dotenv()(find_dotenv())
 client = Groq(api_key=os.getenv("GROQ_KEY"))
 
 response = client.chat.completions.create(

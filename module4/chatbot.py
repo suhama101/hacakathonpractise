@@ -2,9 +2,9 @@
 client = Groq(api_key="gsk_XXXX...")
 
 # Yeh lagao uski jagah:
-from dotenv import load_dotenv
+from dotenv import load_dotenv , find_dotenv
 import os
-load_dotenv()
+load_dotenv()(find_dotenv())
 client = Groq(api_key=os.getenv("GROQ_KEY"))
 
 messages = [
