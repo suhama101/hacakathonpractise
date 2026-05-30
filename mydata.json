@@ -1,0 +1,12 @@
+{
+    "user_001": {
+        "name": "Suhama",
+        "city": "Lahore",
+        "joined": "2026-05-30"
+    },
+    "user_002": {
+        "name": "Ali",
+        "city": "Karachi",
+        "joined": "2026-05-30"
+    }
+}

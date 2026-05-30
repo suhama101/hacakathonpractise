@@ -1,0 +1,30 @@
+[
+    {
+        "session_id": "default",
+        "role": "user",
+        "content": "Python kya hai?",
+        "time": "20:20:24",
+        "date": "2026-05-30"
+    },
+    {
+        "session_id": "default",
+        "role": "assistant",
+        "content": "Python ek programming language hai!",
+        "time": "20:20:24",
+        "date": "2026-05-30"
+    },
+    {
+        "session_id": "default",
+        "role": "user",
+        "content": "Loops explain karo",
+        "time": "20:20:24",
+        "date": "2026-05-30"
+    },
+    {
+        "session_id": "default",
+        "role": "assistant",
+        "content": "Loops code ko repeat karte hain...",
+        "time": "20:20:24",
+        "date": "2026-05-30"
+    }
+]
