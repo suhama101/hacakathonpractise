@@ -10,7 +10,7 @@ from PIL import Image
 # ==================
 # SETUP
 # ==================
-load_dotenv(r"C:\Users\Suhama\Desktop\Hackathon\.env")
+load_dotenv(r"C:\Users\Suhama\Desktop\Hackathonn\AIstudybuddy\.env")
 client = Groq(api_key=os.getenv("GROQ_KEY"))
 
 HISTORY_FILE = "history.json"
@@ -50,9 +50,7 @@ def ask_ai(messages, subject):
     - Student ko encourage karo
     - Agar math hai to steps clearly dikhao
     """
-    
     full_messages = [{"role": "system", "content": system}] + messages
-    
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=full_messages,
@@ -64,15 +62,12 @@ def analyze_image_question(uploaded_file, question):
     image_bytes = uploaded_file.getvalue()
     image_data = base64.b64encode(image_bytes).decode("utf-8")
     file_type = uploaded_file.type
-    
     prompt = f"""
     Tum ek Pakistani teacher ho.
     Is image ko dekho aur yeh karo: {question}
-    
     Urdu aur English mix mein jawab do.
     Step by step explain karo.
     """
-    
     response = client.chat.completions.create(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[{
@@ -135,14 +130,13 @@ with st.sidebar:
     st.markdown("# 📚 Study Buddy")
     st.markdown("*Pakistan ka AI Teacher*")
     st.divider()
-    
-    # Subject selection
+
     subject = st.selectbox(
         "📖 Subject:",
         [
             "General",
             "Mathematics",
-            "Physics", 
+            "Physics",
             "Chemistry",
             "Biology",
             "Computer Science",
@@ -150,28 +144,29 @@ with st.sidebar:
             "Urdu"
         ]
     )
-    
+
     st.divider()
-    
-    # Mode selection
+
     mode = st.radio(
         "🎯 Mode:",
         ["💬 Chat", "📸 Image Q&A", "📊 History"]
     )
-    
+
     st.divider()
-    
-    # Clear chat
+
     if st.button("🗑️ Chat Clear", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
-    
+
     st.divider()
-    
-    # Stats
+
+    # Stats — Updated
     history = load_history()
-    st.metric("Total Sawaal", len(history))
-    
+    st.metric("📚 Total Sawaal", len(history))
+    st.metric("📅 Aaj Ke Sawaal",
+        len([h for h in history if h["date"] == datetime.now().strftime("%Y-%m-%d")])
+    )
+
     st.divider()
     st.caption("SE Hackathon 2026")
     st.caption("CUST Islamabad")
@@ -196,44 +191,35 @@ if "messages" not in st.session_state:
 # MODE: CHAT
 # ==================
 if mode == "💬 Chat":
-    
-    # Welcome message
+
     if len(st.session_state.messages) == 0:
         with st.chat_message("assistant"):
             st.write(f"Assalam o Alaikum! 👋 Main tumhara **{subject}** teacher hun. Koi bhi sawaal poochho — main step by step samjhaunga!")
-    
-    # Chat history dikhao
+
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    
-    # User input
+
     user_input = st.chat_input(f"💬 {subject} ka sawaal likho...")
-    
+
     if user_input:
-        # User message
         with st.chat_message("user"):
             st.markdown(user_input)
         st.session_state.messages.append({
             "role": "user",
             "content": user_input
         })
-        
-        # AI response
+
         with st.chat_message("assistant"):
             with st.spinner("Soch raha hun... 🤔"):
                 try:
                     answer = ask_ai(st.session_state.messages, subject)
                     st.markdown(answer)
-                    
                     st.session_state.messages.append({
                         "role": "assistant",
                         "content": answer
                     })
-                    
-                    # History mein save
                     save_to_history(subject, user_input, answer)
-                    
                 except Exception as e:
                     st.error(f"❌ Error: {e}")
 
@@ -241,21 +227,20 @@ if mode == "💬 Chat":
 # MODE: IMAGE Q&A
 # ==================
 elif mode == "📸 Image Q&A":
-    
+
     st.subheader("📸 Image se Sawaal Poochho")
     st.write("Math problem, diagram, ya koi bhi image upload karo — AI solve karega!")
-    
+
     col1, col2 = st.columns([1, 1])
-    
+
     with col1:
         uploaded = st.file_uploader(
             "Image upload karo:",
             type=["jpg", "jpeg", "png"]
         )
-        
         if uploaded:
             st.image(Image.open(uploaded), caption="Tumhari image", use_column_width=True)
-    
+
     with col2:
         if uploaded:
             img_question = st.text_area(
@@ -263,7 +248,7 @@ elif mode == "📸 Image Q&A":
                 placeholder="Is problem ko solve karo...\nIs diagram ko explain karo...\nIs image mein kya hai?",
                 height=100
             )
-            
+
             quick = st.selectbox(
                 "Ya quick select karo:",
                 [
@@ -274,26 +259,23 @@ elif mode == "📸 Image Q&A":
                     "Is text ko read karke summarize karo"
                 ]
             )
-            
+
             final_question = img_question if quick == "Custom sawaal" else quick
-            
+
             if st.button("🔍 Analyze Karo!", type="primary", use_container_width=True):
                 if final_question:
                     with st.spinner("AI dekh rahi hai... 👁️"):
                         try:
                             result = analyze_image_question(uploaded, final_question)
-                            
                             st.divider()
                             st.subheader("📋 AI Ka Jawab:")
                             st.markdown(result)
-                            
                             save_to_history(
                                 f"{subject} (Image)",
                                 final_question,
                                 result
                             )
                             st.success("✅ History mein save ho gaya!")
-                            
                         except Exception as e:
                             st.error(f"❌ Error: {e}")
                 else:
@@ -305,44 +287,41 @@ elif mode == "📸 Image Q&A":
 # MODE: HISTORY
 # ==================
 elif mode == "📊 History":
-    
+
     st.subheader("📊 Tumhari Study History")
-    
+
     history = load_history()
-    
+
     if not history:
         st.info("Abhi koi history nahi — pehle kuch sawaal poochho!")
     else:
-        # Stats
         col1, col2, col3 = st.columns(3)
         col1.metric("Total Sawaal", len(history))
-        
+
         subjects_used = list(set(h["subject"] for h in history))
         col2.metric("Subjects", len(subjects_used))
-        col3.metric("Aaj Ke Sawaal", 
+        col3.metric("Aaj Ke Sawaal",
             len([h for h in history if h["date"] == datetime.now().strftime("%Y-%m-%d")])
         )
-        
+
         st.divider()
-        
-        # Filter
+
         filter_subject = st.selectbox(
             "Subject filter:",
             ["Sab"] + subjects_used
         )
-        
+
         filtered = history if filter_subject == "Sab" else [
             h for h in history if h["subject"] == filter_subject
         ]
-        
-        # History dikhao
+
         for item in reversed(filtered[-20:]):
             with st.expander(f"📝 [{item['date']} {item['time']}] {item['subject']} — {item['question'][:50]}..."):
                 st.write("**Sawaal:**", item["question"])
                 st.divider()
                 st.write("**AI Ka Jawab:**")
                 st.markdown(item["answer"])
-        
+
         st.divider()
         if st.button("🗑️ Sari History Delete Karo", type="secondary"):
             with open(HISTORY_FILE, "w") as f:
